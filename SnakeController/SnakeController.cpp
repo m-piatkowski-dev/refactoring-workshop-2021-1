@@ -63,6 +63,17 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
     }
 }
 
+    void Controller::newHeadAdd(Snake::Controller::Segment& currentHead, Snake::Controller::Segment& newHead, bool& lost)
+    {    for (auto segment : m_segments) 
+        {
+            if (segment.x == newHead.x and segment.y == newHead.y) {
+                m_scorePort.send(std::make_unique<EventT<LooseInd>>());
+                lost = true;
+                break;
+            }
+        }
+    }
+
 void Controller::receive(std::unique_ptr<Event> e)
 {
     try { //dddd
@@ -77,13 +88,7 @@ void Controller::receive(std::unique_ptr<Event> e)
 
         bool lost = false;
 
-        for (auto segment : m_segments) {
-            if (segment.x == newHead.x and segment.y == newHead.y) {
-                m_scorePort.send(std::make_unique<EventT<LooseInd>>());
-                lost = true;
-                break;
-            }
-        }
+        newHeadAdd(currentHead, newHead, lost);
 
         if (not lost) {
             if (std::make_pair(newHead.x, newHead.y) == m_foodPosition) {
@@ -108,7 +113,8 @@ void Controller::receive(std::unique_ptr<Event> e)
             }
         }
 
-        if (not lost) {
+        if (not lost) 
+        {
             m_segments.push_front(newHead);
             DisplayInd placeNewHead;
             placeNewHead.x = newHead.x;

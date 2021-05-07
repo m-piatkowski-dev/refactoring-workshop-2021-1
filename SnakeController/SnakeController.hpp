@@ -31,7 +31,7 @@ public:
     Controller& operator=(Controller const& p_rhs) = delete;
 
     void receive(std::unique_ptr<Event> e) override;
-
+    void Controller::newHeadAdd(Snake::Controller::Segment& currentHead, Snake::Controller::Segment& newHead,  bool& lost);
 private:
     struct Segment
     {
